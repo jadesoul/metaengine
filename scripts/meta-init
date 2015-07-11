@@ -53,59 +53,63 @@ for k in dft_meta:
 if __name__=='__main__':
     program=os.path.basename(sys.argv[0])
 
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print >>sys.stderr, globals()['__doc__'] % locals()
         sys.exit(1)
-    
-    input_is_dir=0
-    fp=os.path.abspath(sys.argv[1])
-    if os.path.isfile(fp):
-        pass
-    elif os.path.isdir(fp):
-        #if os.path.dirname(fp)!=fp:
-        #    fp=os.path.dirname(fp)
-        pass
-        input_is_dir=1
-    else:
-        print >>sys.stderr, 'bad input:', fp
+
+    for i in xrange(1, len(sys.argv)):
+
+        input_is_dir=0
+        fp=os.path.abspath(sys.argv[i])
+        if os.path.isfile(fp):
+            pass
+        elif os.path.isdir(fp):
+            #if os.path.dirname(fp)!=fp:
+            #    fp=os.path.dirname(fp)
+            pass
+            input_is_dir=1
+        else:
+            print >>sys.stderr, 'bad input:', fp
+            
+        fp_meta=fp+'.meta.txt'
+
+        print >>sys.stderr, 'Meta File Path:', fp_meta
+
+        meta_changed=0
+        if os.path.isfile(fp_meta):
+            with open(fp_meta) as fin: 
+                txt_meta=fin.read()
+                meta=load_meta(txt_meta)
         
-    fp_meta=fp+'.meta.txt'
+            #update dft meta
+            for k, v in dft_meta.iteritems():
+                if k not in meta:
+                    meta_changed=1
+                    meta[k]=v
+        else:
+            meta=dft_meta
+            meta_changed=1
 
-    print >>sys.stderr, 'Meta File Path:', fp_meta
+        file_name=os.path.basename(fp)
+        if not input_is_dir:
+            name=os.path.splitext(file_name)[0]
+        else:
+            name=file_name
 
-    meta_changed=0
-    if os.path.isfile(fp_meta):
-        with open(fp_meta) as fin: 
-            txt_meta=fin.read()
-            meta=load_meta(txt_meta)
-    
-        #update dft meta
-        for k, v in dft_meta.iteritems():
-            if k not in meta:
-                meta_changed=1
-                meta[k]=v
-    else:
-        meta=dft_meta
-        meta_changed=1
+        if meta['题名'] != name:
+            meta['题名'] = name 
+            meta_changed=1
 
-    name=os.path.basename(fp)
-    if not input_is_dir:
-        name=os.path.splitext(file_name)[0]
+        if meta['路径'] != fp:
+            meta['路径'] = fp
+            meta_changed=1
 
-    if meta['题名'] != name:
-        meta['题名'] = name 
-        meta_changed=1
+        meta_string=dump_meta(meta)
+        print >>sys.stderr, 'Dump Meta String:\n', meta_string
 
-    if meta['路径'] != fp:
-        meta['路径'] = fp
-        meta_changed=1
-
-    meta_string=dump_meta(meta)
-    print >>sys.stderr, 'Dump Meta String:\n', meta_string
-
-    if meta_changed:
-        print >>sys.stderr, 'Save Meta String:', fp_meta
-        with open(fp_meta, 'w') as fout:
-            fout.write(meta_string)
+        if meta_changed:
+            print >>sys.stderr, 'Save Meta String:', fp_meta
+            with open(fp_meta, 'w') as fout:
+                fout.write(meta_string)
 
 
