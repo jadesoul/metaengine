@@ -1,0 +1,111 @@
+#!/usr/bin/python
+#coding:utf8
+
+'''
+Usage:
+    %(program)s <FILE or DIR>
+Functions:
+    Create a meta file for the input FILE or DIR
+    and then auto open the meta file for edit
+'''
+
+import os, sys
+
+def load_meta(meta_string):
+    meta={}
+    for line in meta_string.strip().split('\n'):
+        line=line.strip()
+        if not line: continue
+        key, val=line.split(':', 1)
+        meta[key]=val.strip()
+    return meta
+
+def dump_meta(meta):
+    ss=[]
+    for k, v in meta.iteritems():
+        ss.append('%s: %s' % (k, v))
+    return '\n'.join(ss)+'\n'
+
+dft_meta_string='''
+路径:
+题名:
+摘要:
+领域: 机器翻译/机器学习
+主题: 分类、聚类
+数学: 概率论、统计学
+模型: 图模型
+算法: 维特比/遗传算法
+数据结构: 双数组Trie树 后缀树
+标签:
+工具: 评测/开源工具/开源库
+类型: 论文/书籍/文摘 硕博士学位论文/期刊论文 论文集/综述
+会议: ACL
+作者: 吴胜兰
+语言: 英语/中文
+编程语言:
+机构: 百度/北大/中科院自动化所/中科院计算所
+'''
+
+dft_meta=load_meta(dft_meta_string)
+for k in dft_meta:
+    dft_meta[k]=''
+
+if __name__=='__main__':
+    program=os.path.basename(sys.argv[0])
+
+    if len(sys.argv) != 2:
+        print >>sys.stderr, globals()['__doc__'] % locals()
+        sys.exit(1)
+    
+    input_is_dir=0
+    fp=os.path.abspath(sys.argv[1])
+    if os.path.isfile(fp):
+        pass
+    elif os.path.isdir(fp):
+        #if os.path.dirname(fp)!=fp:
+        #    fp=os.path.dirname(fp)
+        pass
+        input_is_dir=1
+    else:
+        print >>sys.stderr, 'bad input:', fp
+        
+    fp_meta=fp+'.meta.txt'
+
+    print >>sys.stderr, 'Meta File Path:', fp_meta
+
+    meta_changed=0
+    if os.path.isfile(fp_meta):
+        with open(fp_meta) as fin: 
+            txt_meta=fin.read()
+            meta=load_meta(txt_meta)
+    
+        #update dft meta
+        for k, v in dft_meta.iteritems():
+            if k not in meta:
+                meta_changed=1
+                meta[k]=v
+    else:
+        meta=dft_meta
+        meta_changed=1
+
+    name=os.path.basename(fp)
+    if not input_is_dir:
+        name=os.path.splitext(file_name)[0]
+
+    if meta['题名'] != name:
+        meta['题名'] = name 
+        meta_changed=1
+
+    if meta['路径'] != fp:
+        meta['路径'] = fp
+        meta_changed=1
+
+    meta_string=dump_meta(meta)
+    print >>sys.stderr, 'Dump Meta String:\n', meta_string
+
+    if meta_changed:
+        print >>sys.stderr, 'Save Meta String:', fp_meta
+        with open(fp_meta, 'w') as fout:
+            fout.write(meta_string)
+
+

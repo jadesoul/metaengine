@@ -12,6 +12,6 @@ setup(
     url='http://jadesoul.sinaapp.com/',
     license='Python Software Foundation License',
     #packages=['libjade', 'libjade/database'],
-    scripts=filter(isfile, ['scripts/'+i for i in listdir('scripts')]),
+    scripts=filter(isfile, ['scripts/'+i for i in listdir('scripts') if i.startswith('meta-')]),
 )
 
