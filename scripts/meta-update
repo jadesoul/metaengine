@@ -11,6 +11,16 @@ Functions:
 
 import os, sys
 
+
+root_dirs='''
+/Users/jadesoul/Documents
+'''.strip().split('\n')
+
+#TODO:
+#travel each root dir and gather .meta.txt file, extract infomation
+#generate a db or index file, like a search engine
+
+
 def load_meta(meta_string):
     meta={}
     for line in meta_string.strip().split('\n'):
@@ -61,10 +71,6 @@ if __name__=='__main__':
 
         input_is_dir=0
         fp=os.path.abspath(sys.argv[i])
-
-        if fp.endswith('.meta.txt'):
-            continue
-
         if os.path.isfile(fp):
             pass
         elif os.path.isdir(fp):

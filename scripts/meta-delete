@@ -1,0 +1,30 @@
+#!/usr/bin/python
+#coding:utf8
+
+'''
+Usage:
+    %(program)s <FILE or DIR>
+Functions:
+    delete meta file for the input
+'''
+
+import os, sys
+
+if __name__=='__main__':
+    program=os.path.basename(sys.argv[0])
+
+    if len(sys.argv) < 2:
+        print >>sys.stderr, globals()['__doc__'] % locals()
+        sys.exit(1)
+
+    for i in xrange(1, len(sys.argv)):
+        fp_input=os.path.abspath(sys.argv[i])
+
+        if fp_input.endswith('.meta.txt'):
+            continue
+
+        fp_meta=fp_input + '.meta.txt'
+
+        if os.path.isfile(fp_meta):
+            os.unlink(fp_meta)
+
